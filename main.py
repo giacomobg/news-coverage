@@ -2,6 +2,8 @@ import pprint, datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import matplotlib.ticker as plticker
 import seaborn as sns
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
@@ -11,7 +13,7 @@ attributes = {
     'axes.facecolor' : '#f0e6f2'
 }
 sns.set(context='paper',style='darkgrid',rc=attributes)
-sns.set_palette(sns.diverging_palette(275,280,center='dark',n=7))
+sns.set_palette(sns.cubehelix_palette(5,reverse=True))#sns.diverging_palette(270,320,center='dark',n=7))
 
 def import_data():
     """Retrieve VW articles from csv file."""
@@ -35,10 +37,10 @@ def analyse_words():
     for day in time_periods:
         df_tmp = df[df.time_period == day]
         day_content = ' '.join(df_tmp.content.values)
-        if day == time_periods[6]:
-            df_tmp = df_tmp[['title','published','source','media-type']]
-            df_tmp = df_tmp.sort_values('published')
-            print(df_tmp)
+        # if day == time_periods[3]:
+            # df_tmp = df_tmp[['title','published','source','media-type']]
+            # df_tmp = df_tmp.sort_values('published')
+            # print(df_tmp)
         df_days[day] = day_content
         # print(df_days.day.iloc[0])
 
@@ -61,6 +63,10 @@ def analyse_words():
     tfidf = TfidfVectorizer(stop_words=stop_words)
     sparse = tfidf.fit_transform(documents)
     features = tfidf.get_feature_names()
+    # set up for plot of tfidf over time
+    chosen_wrds = ['EPA','Winterkorn','Mueller','BMW','Nitrogen']
+    tfidf_plot = pd.DataFrame(columns=chosen_wrds,index=time_periods)
+    chosen_ind = [features.index(wrd.lower()) for wrd in chosen_wrds]
     n_best = 20
     words_df = pd.DataFrame(columns=time_periods,index=np.arange(n_best))
     scores_df = pd.DataFrame(columns=time_periods,index=np.arange(n_best))
@@ -71,8 +77,23 @@ def analyse_words():
         scores_df[time_periods[rowid]] = tfidf_scores
         if tfidf_scores[0] != 0:
             words_df[time_periods[rowid]] = best_features
-    words_df.to_csv('tfidf_words.csv')
-    scores_df.to_csv('tfidf_scores.csv')
+        # add to data for tfidf plot
+        tfidf_plot.loc[time_periods[rowid]] = row[chosen_ind]
+    print(tfidf_plot)
+    fig,ax = plt.subplots()
+    for column in tfidf_plot:
+        tfidf_plot[column].plot(kind='line',linewidth=2,ax=ax)
+    ax.legend()
+    ax.set_xticklabels(time_periods)
+    ax.xaxis.set_minor_locator(plticker.NullLocator())
+    ax.xaxis.set_major_locator(mdates.DayLocator())
+    # ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y/%m/%d'))
+    fig.subplots_adjust(bottom=0.2)
+    plt.xticks(rotation=83,ha='center')
+    plt.title('tf-idf Scores')
+    plt.savefig('tf-idf_plot.png')
+    # words_df.to_csv('tfidf_words.csv')
+    # scores_df.to_csv('tfidf_scores.csv')
 
 def plot_vol(time_period):
     """Plot article volume"""
@@ -117,6 +138,6 @@ def plot_days():
     plot_vol(time_period=time_period)
 
 if __name__ == '__main__':
-    plot_days()
-    plot_hours()
+    # plot_days()
+    # plot_hours()
     analyse_words()
