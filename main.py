@@ -79,7 +79,6 @@ def analyse_words():
             words_df[time_periods[rowid]] = best_features
         # add to data for tfidf plot
         tfidf_plot.loc[time_periods[rowid]] = row[chosen_ind]
-    print(tfidf_plot)
     fig,ax = plt.subplots()
     for column in tfidf_plot:
         tfidf_plot[column].plot(kind='line',linewidth=2,ax=ax)
@@ -91,9 +90,9 @@ def analyse_words():
     fig.subplots_adjust(bottom=0.2)
     plt.xticks(rotation=83,ha='center')
     plt.title('tf-idf Scores')
-    plt.savefig('tf-idf_plot.png')
-    # words_df.to_csv('tfidf_words.csv')
-    # scores_df.to_csv('tfidf_scores.csv')
+    plt.savefig('tfidf_plot.png')
+    words_df.to_csv('tfidf_words.csv')
+    scores_df.to_csv('tfidf_scores.csv')
 
 def plot_vol(time_period):
     """Plot article volume"""
