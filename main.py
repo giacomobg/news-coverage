@@ -26,7 +26,7 @@ def import_data():
     return df
 
 def analyse_words():
-    """Find most relevant word for each day."""
+    """Find most relevant words for each day."""
     df = import_data()
     df.time_period = df.published.dt.to_period('D')
     # get all content from one day into the appropriate entry in df_days
@@ -42,7 +42,6 @@ def analyse_words():
             # df_tmp = df_tmp.sort_values('published')
             # print(df_tmp)
         df_days[day] = day_content
-        # print(df_days.day.iloc[0])
 
     # fill in dates that don't have any articles with a 0     
     empty_date = df_days.index[0]
@@ -55,6 +54,8 @@ def analyse_words():
     time_periods = np.sort(time_periods)
 
     # prepare df_days for tf-idf
+    initialisation = ' '.join(df_days.values)
+
     documents = iter(df_days.values)
     # do tf-idf
     stop_words = stopwords.words('english')
@@ -72,13 +73,16 @@ def analyse_words():
     scores_df = pd.DataFrame(columns=time_periods,index=np.arange(n_best))
     for rowid in range(sparse.shape[0]):
         row = np.squeeze(sparse[rowid].toarray())
-        best_ids = np.argsort(row)[::-1][:n_best]
-        best_features,tfidf_scores = zip(*[(features[i],row[i]) for i in best_ids])
-        scores_df[time_periods[rowid]] = tfidf_scores
-        if tfidf_scores[0] != 0:
-            words_df[time_periods[rowid]] = best_features
+        # Retrieve top 20 words and their tfidf scores
+        # best_ids = np.argsort(row)[::-1][:n_best]
+        # best_features,tfidf_scores = zip(*[(features[i],row[i]) for i in best_ids])
+        # scores_df[time_periods[rowid]] = tfidf_scores
+        # if tfidf_scores[0] != 0:
+        #     words_df[time_periods[rowid]] = best_features
+
         # add to data for tfidf plot
         tfidf_plot.loc[time_periods[rowid]] = row[chosen_ind]
+    print('\n\nTfidf values for plot:')
     print(tfidf_plot)
     fig,ax = plt.subplots()
     for column in tfidf_plot:
