@@ -61,11 +61,11 @@ def analyse_words():
     stop_words = stopwords.words('english')
     # Uncomment to add words to the stopwords list
     # stop_words.extend(['volkswagen','car','cars','emissions','scandal'])
-    tfidf = TfidfVectorizer(stop_words=stop_words)
+    tfidf = TfidfVectorizer(stop_words=stop_words)#, sublinear_tf=True)
     sparse = tfidf.fit_transform(documents)
     features = tfidf.get_feature_names()
     # set up for plot of tfidf over time
-    chosen_wrds = ['EPA','Winterkorn','Mueller','BMW','Nitrogen']
+    chosen_wrds = ['EPA','Winterkorn','Mueller','Volkswagen','Nitrogen']
     tfidf_plot = pd.DataFrame(columns=chosen_wrds,index=time_periods)
     chosen_ind = [features.index(wrd.lower()) for wrd in chosen_wrds]
     n_best = 20
@@ -95,9 +95,9 @@ def analyse_words():
     fig.subplots_adjust(bottom=0.2)
     plt.xticks(rotation=83,ha='center')
     plt.title('tf-idf Scores')
-    plt.savefig('tf-idf_plot.png')
-    # words_df.to_csv('tfidf_words.csv')
-    # scores_df.to_csv('tfidf_scores.csv')
+    plt.savefig('tfidf_plot.png')
+    words_df.to_csv('tfidf_words.csv')
+    scores_df.to_csv('tfidf_scores.csv')
 
 def plot_vol(time_period):
     """Plot article volume"""

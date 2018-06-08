@@ -16,3 +16,5 @@ Requires [this dataset](http://research.signalmedia.co/newsir16/index.html) to b
         Words on each day that have the highest tf-idf scores.
     * `tfidf_scores.csv`  
         tf-idf scores of those words.
+    * `tfidf_plot.png`  
+        plot of tf-idf scores for a few select words.
