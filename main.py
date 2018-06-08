@@ -74,11 +74,11 @@ def analyse_words():
     for rowid in range(sparse.shape[0]):
         row = np.squeeze(sparse[rowid].toarray())
         # Retrieve top 20 words and their tfidf scores
-        # best_ids = np.argsort(row)[::-1][:n_best]
-        # best_features,tfidf_scores = zip(*[(features[i],row[i]) for i in best_ids])
-        # scores_df[time_periods[rowid]] = tfidf_scores
-        # if tfidf_scores[0] != 0:
-        #     words_df[time_periods[rowid]] = best_features
+        best_ids = np.argsort(row)[::-1][:n_best]
+        best_features,tfidf_scores = zip(*[(features[i],row[i]) for i in best_ids])
+        scores_df[time_periods[rowid]] = tfidf_scores
+        if tfidf_scores[0] != 0:
+            words_df[time_periods[rowid]] = best_features
 
         # add to data for tfidf plot
         tfidf_plot.loc[time_periods[rowid]] = row[chosen_ind]
@@ -142,6 +142,6 @@ def plot_days():
     plot_vol(time_period=time_period)
 
 if __name__ == '__main__':
-    # plot_days()
-    # plot_hours()
+    plot_days()
+    plot_hours()
     analyse_words()
